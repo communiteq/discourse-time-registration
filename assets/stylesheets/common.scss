@@ -1,0 +1,18 @@
+.d-header-icons .time-registration-icon {
+  &.tracking-active {
+    // Target the button element (.icon)
+    .icon {
+      .d-icon {
+        color: var(--danger);
+      }
+
+      // Explicitly override the hover and focus states
+      &:hover,
+      &:focus {
+        .d-icon {
+          color: var(--danger);
+        }
+      }
+    }
+  }
+}

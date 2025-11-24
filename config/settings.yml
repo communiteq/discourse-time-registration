@@ -1,0 +1,8 @@
+plugins:
+  time_registration_enabled:
+    default: true
+    client: true
+  time_registration_groups:
+    default: ""
+    type: group_list
+    client: true

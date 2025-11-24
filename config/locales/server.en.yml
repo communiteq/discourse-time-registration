@@ -1,0 +1,5 @@
+en:
+  time_registration:
+    started_action: "Started working: %{description}"
+    ended_action: "Finished working: %{description} (Duration: %{duration})"
+    no_description: "No description"

@@ -1,0 +1,14 @@
+en:
+  js:
+    action_codes:
+      time_registration: "time registration"
+    time_registration:
+      title: "Time Registration"
+      start: "Start Timer"
+      stop: "Stop Timer"
+      description_placeholder: "What are you working on?"
+      confirm_start: "Start"
+      cancel: "Cancel"
+      started_action_with_time: "Started working: %{description} - %{when}"
+      ended_action: "Finished working: %{description} (Duration: %{duration})"
+      no_description: "No description"
