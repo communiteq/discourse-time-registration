@@ -1,5 +1,8 @@
 en:
+  action_codes:
+    time_registration: "time registration"
   time_registration:
-    started_action: "Started working: %{description}"
-    ended_action: "Finished working: %{description} (Duration: %{duration})"
-    no_description: "No description"
+    started_action: "started working on <b>%{description}</b>"
+    ended_action: "worked on <b>%{description}</b> for <b>%{duration}<b>"
+    manual_entry_action: "worked on <b>%{description}</b> for <b>%{duration}</b>"
+    no_description: "a task"

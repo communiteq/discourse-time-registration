@@ -7,6 +7,7 @@ import { popupAjaxError } from "discourse/lib/ajax-error";
 import I18n from "discourse-i18n";
 import DButton from "discourse/components/d-button";
 import TimeRegistrationStart from "./modal/time-registration-start";
+import TimeRegistrationStop from "./modal/time-registration-stop";
 
 export default class TimeRegistrationIcon extends Component {
   @service currentUser;
@@ -68,28 +69,63 @@ export default class TimeRegistrationIcon extends Component {
       this.modal.show(TimeRegistrationStart, {
         model: {
           topicId: topicId,
-          save: (description) => this.toggleTimer(topicId, description),
+          saveTimer: (desc) => this.startTimer(topicId, desc),
+          saveManual: (desc, minutes) => this.logManual(topicId, desc, minutes),
         },
       });
     } else {
-      this.toggleTimer(null, null);
+      // Pass the current description from user custom fields
+      const currentDescription = this.currentUser.custom_fields.active_time_registration_description;
+
+      this.modal.show(TimeRegistrationStop, {
+        model: {
+            currentDescription: currentDescription,
+            save: (desc, minutes) => this.stopTimer(desc, minutes)
+        }
+      });
     }
   }
 
-  toggleTimer(topicId, description) {
+  startTimer(topicId, description) {
     ajax("/time-registration/toggle", {
       type: "POST",
-      data: { topic_id: topicId, description },
-    })
-      .then((result) => {
-        // Update local tracked state immediately for UI update
-        this.isTracking = result.active;
+      data: { topic_id: topicId, description, manual_entry: false },
+    }).then((result) => {
+        this.isTracking = true;
+        this.currentUser.custom_fields.active_time_registration_post_id = result.post_id;
+        this.currentUser.custom_fields.active_time_registration_description = description;
+    }).catch(popupAjaxError);
+  }
 
-        // Sync back to currentUser model just in case other parts of app need it
-        const val = result.active ? result.post_id : null;
-        this.currentUser.custom_fields.active_time_registration_post_id = val;
-      })
-      .catch(popupAjaxError);
+  logManual(topicId, description, minutes) {
+    ajax("/time-registration/toggle", {
+      type: "POST",
+      data: { topic_id: topicId, description, duration: minutes, manual_entry: true },
+    }).then(() => {
+        // Manual entry doesn't start tracking, just logs
+        this.dialog.alert("Time logged successfully");
+    }).catch(popupAjaxError);
+  }
+
+  stopTimer(description, minutes) {
+     ajax("/time-registration/toggle", {
+      type: "POST",
+      data: { description, duration: minutes }, // duration is optional override
+    }).then(() => {
+        this.isTracking = false;
+        this.currentUser.custom_fields.active_time_registration_post_id = null;
+        this.currentUser.custom_fields.active_time_registration_description = null;
+    }).catch(popupAjaxError);
+  }
+
+  @action
+  handleResponse(result) {
+      // Update local tracked state immediately for UI update
+      this.isTracking = result.active;
+
+      // Sync back to currentUser model just in case other parts of app need it
+      const val = result.active ? result.post_id : null;
+      this.currentUser.custom_fields.active_time_registration_post_id = val;
   }
 
   <template>

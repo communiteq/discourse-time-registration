@@ -6,3 +6,11 @@ plugins:
     default: ""
     type: group_list
     client: true
+  time_registration_rounding_interval:
+    default: 15
+    min: 1
+    client: true
+  time_registration_round_up_at:
+    default: 7.5
+    min: 0
+    client: true
