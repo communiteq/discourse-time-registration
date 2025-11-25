@@ -22,10 +22,12 @@ after_initialize do
   # Register Custom Fields
   User.register_custom_field_type "active_time_registration_post_id", :integer
   User.register_custom_field_type "active_time_registration_description", :string
+  User.register_custom_field_type "active_time_registration_start", :integer
 
   # Whitelist fields for serialization so the frontend can see them
   DiscoursePluginRegistry.serialized_current_user_fields << "active_time_registration_post_id"
   DiscoursePluginRegistry.serialized_current_user_fields << "active_time_registration_description"
+  DiscoursePluginRegistry.serialized_current_user_fields << "active_time_registration_start"
 
   # Register Post Custom Fields
   Post.register_custom_field_type "time_registration_start", :integer
@@ -132,9 +134,10 @@ after_initialize do
 
         current_user.custom_fields["active_time_registration_post_id"] = post.id
         current_user.custom_fields["active_time_registration_description"] = description
+        current_user.custom_fields["active_time_registration_start"] = post.custom_fields["time_registration_start"]
         current_user.save_custom_fields
 
-        render json: success_json.merge(active: true, post_id: post.id)
+        render json: success_json.merge(active: true, post_id: post.id, start_time: post.custom_fields["time_registration_start"])
       else
         render_json_error("Could not create post")
       end
@@ -149,7 +152,7 @@ after_initialize do
 
         if params[:duration].present?
           # User overrode the time
-          duration_seconds = params[:duration].to_i * 60
+          duration_seconds = [params[:duration].to_i, 1].max * 60
         else
           # Calculate from stopwatch
           start_time = post.custom_fields["time_registration_start"].to_i
@@ -172,6 +175,7 @@ after_initialize do
 
       current_user.custom_fields.delete("active_time_registration_post_id")
       current_user.custom_fields.delete("active_time_registration_description")
+      current_user.custom_fields.delete("active_time_registration_start")
       current_user.save_custom_fields
 
       render json: success_json.merge(active: false)

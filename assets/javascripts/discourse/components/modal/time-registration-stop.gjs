@@ -1,14 +1,73 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
+import { service } from "@ember/service";
 import DButton from "discourse/components/d-button";
 import DModal from "discourse/components/d-modal";
 import { Input } from "@ember/component";
 import i18n from "discourse/helpers/i18n";
+import { on } from "@ember/modifier";
 
 export default class TimeRegistrationStop extends Component {
+  @service siteSettings;
   @tracked description = this.args.model.currentDescription || "";
-  @tracked duration = ""; // Optional override
+  @tracked duration = "";
+  @tracked _useRounding = true;
+
+  constructor() {
+    super(...arguments);
+    this.calculateDuration();
+  }
+
+  get useRounding() {
+    return this._useRounding;
+  }
+
+  set useRounding(val) {
+    this._useRounding = val;
+    this.calculateDuration();
+  }
+
+  calculateDuration() {
+    if (!this.args.model.startTime) return;
+
+    const now = Math.floor(Date.now() / 1000);
+    const start = parseInt(this.args.model.startTime, 10);
+    let seconds = Math.max(0, now - start);
+
+    if (this.useRounding) {
+        seconds = this.applyRounding(seconds);
+    }
+
+    this.duration = this.formatDuration(seconds);
+  }
+
+  applyRounding(seconds) {
+      const minutes = seconds / 60.0;
+      const interval = parseInt(this.siteSettings.time_registration_rounding_interval, 10);
+      const roundUpAt = parseInt(this.siteSettings.time_registration_round_up_at, 10);
+
+      if (interval <= 0) return seconds;
+
+      const base = Math.floor(minutes / interval) * interval;
+      const remainder = minutes % interval;
+
+      let finalMinutes = remainder >= roundUpAt ? base + interval : base;
+      finalMinutes = Math.max(finalMinutes, interval); // Ensure at least interval
+
+      return Math.floor(finalMinutes * 60);
+  }
+
+  formatDuration(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  }
+
+  @action
+  toggleRounding() {
+      this.useRounding = !this.useRounding;
+  }
 
   @action
   save() {
@@ -40,13 +99,19 @@ export default class TimeRegistrationStop extends Component {
         </div>
 
         <div class="control-group">
-          <label>{{i18n "time_registration.duration_placeholder"}} (Optional override)</label>
-          <Input
-            @type="text"
-            @value={{this.duration}}
-            class="form-control"
-            placeholder="Leave empty to use timer"
-          />
+          <label>{{i18n "time_registration.duration_placeholder"}}</label>
+          <div class="duration-input-wrapper" style="display: flex; align-items: center; gap: 10px;">
+            <Input
+                @type="text"
+                @value={{this.duration}}
+                class="form-control"
+                placeholder="HH:MM"
+            />
+            <label style="margin: 0; display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" checked={{this.useRounding}} {{on "change" this.toggleRounding}} />
+                <span style="margin-left: 5px;">Round</span>
+            </label>
+          </div>
         </div>
       </:body>
 

@@ -76,10 +76,12 @@ export default class TimeRegistrationIcon extends Component {
     } else {
       // Pass the current description from user custom fields
       const currentDescription = this.currentUser.custom_fields.active_time_registration_description;
+      const startTime = this.currentUser.custom_fields.active_time_registration_start;
 
       this.modal.show(TimeRegistrationStop, {
         model: {
             currentDescription: currentDescription,
+            startTime: startTime,
             save: (desc, minutes) => this.stopTimer(desc, minutes)
         }
       });
@@ -94,6 +96,7 @@ export default class TimeRegistrationIcon extends Component {
         this.isTracking = true;
         this.currentUser.custom_fields.active_time_registration_post_id = result.post_id;
         this.currentUser.custom_fields.active_time_registration_description = description;
+        this.currentUser.custom_fields.active_time_registration_start = result.start_time;
     }).catch(popupAjaxError);
   }
 
@@ -115,6 +118,7 @@ export default class TimeRegistrationIcon extends Component {
         this.isTracking = false;
         this.currentUser.custom_fields.active_time_registration_post_id = null;
         this.currentUser.custom_fields.active_time_registration_description = null;
+        this.currentUser.custom_fields.active_time_registration_start = null;
     }).catch(popupAjaxError);
   }
 
