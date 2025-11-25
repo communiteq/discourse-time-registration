@@ -106,7 +106,6 @@ export default class TimeRegistrationIcon extends Component {
       data: { topic_id: topicId, description, duration: minutes, manual_entry: true },
     }).then(() => {
         // Manual entry doesn't start tracking, just logs
-        this.dialog.alert("Time logged successfully");
     }).catch(popupAjaxError);
   }
 

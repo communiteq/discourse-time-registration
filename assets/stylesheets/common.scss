@@ -16,3 +16,34 @@
     }
   }
 }
+
+.d-modal__body input[type="text"].time-input {
+  width: 100px;
+}
+
+.time-registration-post {
+  .small-action-buttons .small-action-edit {
+    display: none;
+  }
+  .time-registration-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    .time-registration-edit-btn {
+      padding: 0 5px;
+      color: var(--primary-medium);
+      opacity: 0;
+      transition: opacity 0.2s;
+
+      &:hover {
+        color: var(--primary);
+        background: transparent;
+      }
+    }
+
+    &:hover .time-registration-edit-btn {
+      opacity: 1;
+    }
+  }
+}

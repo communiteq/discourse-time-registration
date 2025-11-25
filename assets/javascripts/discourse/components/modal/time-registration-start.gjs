@@ -7,15 +7,35 @@ import { Input } from "@ember/component";
 import i18n from "discourse/helpers/i18n";
 import { fn } from "@ember/helper";
 import eq from "truth-helpers/helpers/eq";
+import not from "truth-helpers/helpers/not";
 
 export default class TimeRegistrationStart extends Component {
   @tracked description = "";
-  @tracked duration = ""; // HH:MM format
+  @tracked duration = ""; // HH:MM format or minutes
   @tracked mode = "timer"; // 'timer' or 'manual'
 
   @action
   setMode(mode) {
     this.mode = mode;
+  }
+
+  get parsedMinutes() {
+    if (!this.duration) {
+      return 0;
+    }
+
+    // If it contains a colon, treat as HH:MM
+    if (this.duration.includes(":")) {
+      const [h, m] = this.duration.split(":").map((n) => parseInt(n, 10) || 0);
+      return h * 60 + m;
+    } else {
+      // Otherwise treat as minutes
+      return parseInt(this.duration, 10) || 0;
+    }
+  }
+
+  get isManualValid() {
+    return this.parsedMinutes > 0;
   }
 
   @action
@@ -26,11 +46,7 @@ export default class TimeRegistrationStart extends Component {
 
   @action
   saveManual() {
-    // Parse HH:MM to minutes
-    const [hours, minutes] = this.duration.split(":").map(n => parseInt(n, 10) || 0);
-    const totalMinutes = (hours * 60) + minutes;
-
-    this.args.model.saveManual(this.description, totalMinutes);
+    this.args.model.saveManual(this.description, this.parsedMinutes);
     this.args.closeModal();
   }
 
@@ -71,7 +87,7 @@ export default class TimeRegistrationStart extends Component {
               @type="text"
               @value={{this.duration}}
               class="form-control"
-              placeholder="01:30"
+              placeholder="HH:MM or minutes"
             />
           </div>
         {{/if}}
@@ -89,6 +105,7 @@ export default class TimeRegistrationStart extends Component {
             @action={{this.saveManual}}
             @label="time_registration.confirm_manual"
             class="btn-primary"
+            @disabled={{not this.isManualValid}}
           />
         {{/if}}
         <DButton

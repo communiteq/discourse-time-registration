@@ -47,7 +47,7 @@ after_initialize do
     requires_plugin DiscourseTimeRegistration::PLUGIN_NAME
 
     before_action :ensure_logged_in
-    before_action :ensure_can_track_time
+    before_action :ensure_can_track_time, only: [:toggle]
 
     def toggle
       active_post_id = current_user.custom_fields["active_time_registration_post_id"]
@@ -63,6 +63,36 @@ after_initialize do
       else
         start_timer
       end
+    end
+
+    def update
+      post_id = params.require(:post_id)
+      description = params[:description]
+      duration_minutes = params[:duration].to_i
+
+      post = Post.find_by(id: post_id)
+      raise Discourse::NotFound unless post
+
+      # Allow Admin or the Author to edit
+      unless current_user.admin? || current_user.id == post.user_id
+        raise Discourse::InvalidAccess
+      end
+
+      duration_seconds = duration_minutes * 60
+
+      post.custom_fields["time_registration_description"] = description
+      post.custom_fields["time_registration_amount"] = duration_seconds
+      post.save_custom_fields
+
+      # Update the raw text for fallback/search
+      new_raw = I18n.t("time_registration.ended_action",
+        description: description.presence || I18n.t("time_registration.no_description"),
+        duration: format_duration(duration_seconds)
+      )
+
+      post.revise(current_user, { raw: new_raw }, { skip_validations: true, bypass_bump: true })
+
+      render json: success_json
     end
 
     private
@@ -207,6 +237,7 @@ after_initialize do
 
   DiscourseTimeRegistration::Engine.routes.draw do
     post "/toggle" => "time_tracking#toggle"
+    put "/update" => "time_tracking#update"
   end
 
   Discourse::Application.routes.append do

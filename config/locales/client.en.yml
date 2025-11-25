@@ -17,3 +17,5 @@ en:
       ended_action: "worked on <b>%{description}</b> for <b>%{duration}</b>"
       manual_entry_action: "worked on <b>%{description}</b> for <b>%{duration}</b>"
       no_description: "a task"
+      edit: "Edit Time Log"
+      save: "Save Changes"

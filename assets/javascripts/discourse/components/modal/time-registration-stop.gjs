@@ -104,7 +104,7 @@ export default class TimeRegistrationStop extends Component {
             <Input
                 @type="text"
                 @value={{this.duration}}
-                class="form-control"
+                class="form-control time-input"
                 placeholder="HH:MM"
             />
             <label style="margin: 0; display: flex; align-items: center; cursor: pointer;">
