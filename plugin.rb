@@ -116,7 +116,7 @@ after_initialize do
       # Base query: Time registration posts
       query = Post.where(action_code: "time_registration")
                   .joins(:topic)
-                  .includes(:user, :topic)
+                  .includes(:user, topic: :category)
                   .preload(:_custom_fields)
 
       # Security: Only show topics the user can see
@@ -151,10 +151,20 @@ after_initialize do
         amount = p.custom_fields["time_registration_amount"].to_i
         next if amount <= 0 # Skip if no time logged (e.g. just started)
 
+        category_name = if p.topic.private_message?
+                          I18n.t("time_registration.report.personal_message")
+                        elsif p.topic.category
+                          p.topic.category.name
+                        else
+                          I18n.t("uncategorized")
+                        end
+
         {
           id: p.id,
+          post_number: p.post_number,
           topic_id: p.topic_id,
           topic_title: p.topic.title,
+          category_name: category_name,
           username: p.user&.username,
           description: p.custom_fields["time_registration_description"] || I18n.t("time_registration.no_description"),
           duration_seconds: amount,

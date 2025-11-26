@@ -55,8 +55,9 @@
     <table class="table time-report-table">
       <thead>
         <tr>
-          <th>{{i18n "time_registration.report.topic"}}</th>
+          <th>{{i18n "time_registration.report.category"}}</th>
           <th>{{i18n "time_registration.report.user"}}</th>
+          <th>{{i18n "time_registration.report.topic"}}</th>
           <th>{{i18n "time_registration.report.description"}}</th>
           <th>{{i18n "time_registration.report.time_spent"}}</th>
           <th>{{i18n "time_registration.report.date"}}</th>
@@ -65,12 +66,13 @@
       <tbody>
         {{#each this.reportData as |row|}}
           <tr>
-            <td><a href={{row.topicUrl}}>{{row.topic_title}}</a></td>
+            <td>{{row.category_name}}</td>
             <td>
               <a href="/u/{{row.username}}" data-user-card={{row.username}}>
                 {{avatar row imageSize="tiny"}} {{row.username}}
               </a>
             </td>
+            <td><a href={{row.topicUrl}}>{{row.topic_title}}</a></td>
             <td>{{row.description}}</td>
             <td>{{row.formattedDuration}}</td>
             <td>{{row.formattedDate}}</td>

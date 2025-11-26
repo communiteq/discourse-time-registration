@@ -84,7 +84,7 @@ export default class TimeRegistrationReportController extends Controller {
       this.reportData = result.report.map(row => ({
         ...row,
         formattedDuration: this.formatDuration(row.duration_seconds),
-        topicUrl: `/t/${row.topic_id}`,
+        topicUrl: `/t/${row.topic_id}/${row.post_number}`,
         // Use browser's native locale formatting
         formattedDate: new Date(row.created_at).toLocaleDateString()
       }));
