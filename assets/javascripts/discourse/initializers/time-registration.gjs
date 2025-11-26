@@ -1,5 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import TimeRegistrationSmallActionPost from "../components/time-registration-small-action-post";
+import { i18n } from "discourse-i18n";
 
 function initPlugin(api) {
   const siteSettings = api.container.lookup("service:site-settings");
@@ -7,6 +8,14 @@ function initPlugin(api) {
   if (!siteSettings.time_registration_enabled) {
     return;
   }
+
+  api.addCommunitySectionLink({
+    name: "time_registration.title",
+    route: "timeRegistrationReport",
+    title: i18n("time_registration.title"),
+    text: i18n("time_registration.title"),
+    icon: "far-clock",
+  });
 
   // Register the icon for the small action
   api.addPostSmallActionIcon("time_registration", "far-clock");

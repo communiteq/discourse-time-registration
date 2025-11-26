@@ -47,3 +47,46 @@
     }
   }
 }
+
+.time-registration-report {
+  padding: 20px;
+  background: var(--secondary);
+
+  .report-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--primary-very-low);
+    border-radius: 5px;
+    align-items: flex-end;
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 200px;
+
+      input[type="date"] {
+        margin-bottom: 0px;
+      }
+    }
+  }
+
+  .time-report-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--primary-low);
+      text-align: left;
+    }
+
+    th {
+      font-weight: bold;
+      background: var(--primary-low-mid);
+    }
+  }
+}

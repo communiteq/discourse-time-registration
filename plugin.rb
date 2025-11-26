@@ -8,6 +8,7 @@ enabled_site_setting :time_registration_enabled
 register_asset "stylesheets/common.scss"
 
 register_svg_icon "stopwatch" if respond_to?(:register_svg_icon)
+register_svg_icon "rotate-left" if respond_to?(:register_svg_icon)
 
 after_initialize do
   module ::DiscourseTimeRegistration
@@ -104,6 +105,64 @@ after_initialize do
       })
 
       render json: success_json
+    end
+
+    def report_data
+      from_date = params[:from]
+      to_date = params[:to]
+      category_id = params[:category_id]
+      username = params[:username]
+
+      # Base query: Time registration posts
+      query = Post.where(action_code: "time_registration")
+                  .joins(:topic)
+                  .includes(:user, :topic)
+                  .preload(:_custom_fields)
+
+      # Security: Only show topics the user can see
+      query = query.merge(Topic.secured(guardian))
+
+      # Filters
+      if from_date.present?
+        query = query.where("posts.created_at >= ?", Date.parse(from_date))
+      end
+
+      if to_date.present?
+        query = query.where("posts.created_at <= ?", Date.parse(to_date).end_of_day)
+      end
+
+      if category_id.present?
+        query = query.where(topics: { category_id: category_id })
+      end
+
+      if username.present?
+        user = User.find_by(username: username)
+        if user
+          query = query.where(user_id: user.id)
+        else
+          return render json: { report: [] }
+        end
+      end
+
+      # Order by newest first
+      query = query.order("posts.created_at DESC").limit(500)
+
+      report = query.map do |p|
+        amount = p.custom_fields["time_registration_amount"].to_i
+        next if amount <= 0 # Skip if no time logged (e.g. just started)
+
+        {
+          id: p.id,
+          topic_id: p.topic_id,
+          topic_title: p.topic.title,
+          username: p.user&.username,
+          description: p.custom_fields["time_registration_description"] || I18n.t("time_registration.no_description"),
+          duration_seconds: amount,
+          created_at: p.created_at
+        }
+      end.compact
+
+      render json: { report: report }
     end
 
     private
@@ -249,6 +308,7 @@ after_initialize do
   DiscourseTimeRegistration::Engine.routes.draw do
     post "/toggle" => "time_tracking#toggle"
     put "/update" => "time_tracking#update"
+    get "/report" => "time_tracking#report_data"
   end
 
   Discourse::Application.routes.append do
