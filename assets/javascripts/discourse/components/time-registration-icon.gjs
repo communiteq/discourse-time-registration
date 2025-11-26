@@ -43,7 +43,6 @@ export default class TimeRegistrationIcon extends Component {
   }
 
   get iconClass() {
-    console.log(this.isTracking ? "True" : "False");
     return this.isTracking ? "time-registration-icon tracking-active" : "time-registration-icon";
   }
 

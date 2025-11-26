@@ -92,6 +92,17 @@ after_initialize do
 
       post.revise(current_user, { raw: new_raw }, { skip_validations: true, bypass_bump: true })
 
+      # Publish the change to MessageBus
+      MessageBus.publish("/topic/#{post.topic_id}", {
+        id: post.id,
+        post_number: post.post_number,
+        updated_at: post.updated_at,
+        user_id: post.user_id,
+        last_editor_id: post.last_editor_id,
+        type: "revised",
+        version: post.version
+      })
+
       render json: success_json
     end
 

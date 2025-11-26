@@ -41,7 +41,7 @@ export default class TimeRegistrationSmallActionPost extends Component {
     const amount = post.time_registration_amount || customFields.time_registration_amount;
     const start = post.time_registration_start || customFields.time_registration_start;
 
-    let message = "";
+    let message = this.args.post.get("raw"); // also makes sure getter is called
 
     if (amount) {
       // Case 1: Work is finished (amount exists)
@@ -59,7 +59,7 @@ export default class TimeRegistrationSmallActionPost extends Component {
         when: when
       });
     } else {
-      // Fallback
+      // Fallback, also makes sure this getter is called on revision
       message = description;
     }
 

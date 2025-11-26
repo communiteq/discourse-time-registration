@@ -10,7 +10,7 @@ function initPlugin(api) {
   }
 
   // Register the icon for the small action
-  api.addPostSmallActionIcon("time_registration", "stopwatch");
+  api.addPostSmallActionIcon("time_registration", "far-clock");
 
   // register custom class for styling
   api.registerValueTransformer(
