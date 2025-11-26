@@ -59,7 +59,6 @@ export default class TimeRegistrationSmallActionPost extends Component {
         when: when
       });
     } else {
-      // Fallback, also makes sure this getter is called on revision
       message = description;
     }
 

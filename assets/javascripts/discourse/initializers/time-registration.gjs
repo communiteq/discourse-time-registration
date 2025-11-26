@@ -2,7 +2,6 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 import TimeRegistrationSmallActionPost from "../components/time-registration-small-action-post";
 
 function initPlugin(api) {
-  console.log("IPA");
   const siteSettings = api.container.lookup("service:site-settings");
 
   if (!siteSettings.time_registration_enabled) {
