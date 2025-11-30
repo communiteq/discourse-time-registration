@@ -72,25 +72,13 @@ export default class TimeRegistrationSmallActionPost extends Component {
     this.modal.show(TimeRegistrationEdit, {
       model: {
         post: post,
-        save: (description, minutes) => {
+        save: (description, minutes, date) => {
           ajax("/time-registration/update", {
             type: "PUT",
-            data: { post_id: post.id, description, duration: minutes },
+            data: { post_id: post.id, description, duration: minutes, date },
           })
           .then(() => {
-             // Update local model for immediate feedback
-             // We need to update both root properties (if used) and custom_fields
-             if (post.custom_fields) {
-                 post.custom_fields.time_registration_description = description;
-                 post.custom_fields.time_registration_amount = minutes * 60;
-             }
-             // Force a re-render by notifying property change if possible,
-             // or relying on Glimmer tracking if we were tracking these.
-             // Since post properties aren't tracked deep inside custom_fields usually,
-             // we might need to trigger a refresh or just set the properties directly on the post object
-             // if our component reads from there.
-             post.set("time_registration_description", description);
-             post.set("time_registration_amount", minutes * 60);
+             // Server handles MessageBus update
           })
           .catch(popupAjaxError);
         }

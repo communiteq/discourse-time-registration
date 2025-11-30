@@ -19,6 +19,7 @@ en:
       no_description: "a task"
       edit: "Edit Time Log"
       save: "Save Changes"
+      date_placeholder: "Date"
       report:
         title: "Time Registration Report"
         from: "Date From"

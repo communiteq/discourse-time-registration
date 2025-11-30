@@ -9,6 +9,7 @@ import i18n from "discourse/helpers/i18n";
 export default class TimeRegistrationEdit extends Component {
   @tracked description = "";
   @tracked duration = "";
+  @tracked date = "";
 
   constructor() {
     super(...arguments);
@@ -22,12 +23,21 @@ export default class TimeRegistrationEdit extends Component {
                    post.custom_fields?.time_registration_amount || 0;
 
     this.duration = this.formatDuration(amount);
+
+    // Initialize date (YYYY-MM-DD)
+    if (post.created_at) {
+      this.date = post.created_at.substring(0, 10);
+    }
   }
 
   formatDuration(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  }
+
+  get maxDate() {
+    return new Date().toISOString().split('T')[0];
   }
 
   @action
@@ -38,7 +48,7 @@ export default class TimeRegistrationEdit extends Component {
         minutes = (h * 60) + m;
     }
 
-    this.args.model.save(this.description, minutes);
+    this.args.model.save(this.description, minutes, this.date);
     this.args.closeModal();
   }
 
@@ -65,6 +75,16 @@ export default class TimeRegistrationEdit extends Component {
             @value={{this.duration}}
             class="form-control time-input"
             placeholder="HH:MM"
+          />
+        </div>
+
+        <div class="control-group">
+          <label>{{i18n "time_registration.date_placeholder"}}</label>
+          <Input
+            @type="date"
+            @value={{this.date}}
+            class="form-control"
+            max={{this.maxDate}}
           />
         </div>
       </:body>

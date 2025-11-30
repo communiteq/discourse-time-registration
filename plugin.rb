@@ -1,6 +1,6 @@
 # name: discourse-time-registration
 # about: Time Registration for Discourse
-# version: 1.0
+# version: 1.1
 # authors: Communiteq
 
 enabled_site_setting :time_registration_enabled
@@ -70,6 +70,7 @@ after_initialize do
       post_id = params.require(:post_id)
       description = params[:description]
       duration_minutes = params[:duration].to_i
+      date_str = params[:date]
 
       post = Post.find_by(id: post_id)
       raise Discourse::NotFound unless post
@@ -84,6 +85,33 @@ after_initialize do
       post.custom_fields["time_registration_description"] = description
       post.custom_fields["time_registration_amount"] = duration_seconds
       post.save_custom_fields
+
+      if date_str.present?
+        begin
+          new_date = Date.parse(date_str)
+
+          if new_date > Date.today
+             return render_json_error(I18n.t("time_registration.errors.future_date"))
+          end
+
+          old_time = post.created_at
+
+          # Construct new time preserving the original time of day
+          new_created_at = Time.zone.local(
+            new_date.year,
+            new_date.month,
+            new_date.day,
+            old_time.hour,
+            old_time.min,
+            old_time.sec
+          )
+
+          post.created_at = new_created_at
+          post.save(validate: false)
+        rescue ArgumentError
+          # Ignore invalid dates
+        end
+      end
 
       # Update the raw text for fallback/search
       new_raw = I18n.t("time_registration.ended_action",

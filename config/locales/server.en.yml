@@ -8,3 +8,5 @@ en:
     no_description: "a task"
     report:
       personal_message: "Personal Message"
+    errors:
+      future_date: "You cannot log time in the future."
