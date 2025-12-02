@@ -16,7 +16,7 @@ export default class TimeRegistrationSmallActionPost extends Component {
   formatDuration(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    return `${h.toString()}:${m.toString().padStart(2, '0')}`;
   }
 
   get canEdit() {
