@@ -1,9 +1,8 @@
+import { tracked } from "@glimmer/tracking";
 import Controller from "@ember/controller";
 import { action } from "@ember/object";
-import { tracked } from "@glimmer/tracking";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import I18n from "discourse-i18n";
 
 export default class TimeRegistrationReportController extends Controller {
   @tracked fromDate = null;
@@ -17,7 +16,7 @@ export default class TimeRegistrationReportController extends Controller {
   formatDuration(seconds) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   }
 
   @action
@@ -50,8 +49,10 @@ export default class TimeRegistrationReportController extends Controller {
     this.hasSearched = false;
 
     // Reset date inputs manually since they are not bound via @value
-    const dateInputs = document.querySelectorAll('.time-registration-report .date-picker');
-    dateInputs.forEach(input => input.value = '');
+    const dateInputs = document.querySelectorAll(
+      ".time-registration-report .date-picker",
+    );
+    dateInputs.forEach((input) => (input.value = ""));
   }
 
   get totalDuration() {
@@ -59,12 +60,15 @@ export default class TimeRegistrationReportController extends Controller {
       return "00:00";
     }
 
-    const totalSeconds = this.reportData.reduce((sum, row) => sum + (row.duration_seconds || 0), 0);
+    const totalSeconds = this.reportData.reduce(
+      (sum, row) => sum + (row.duration_seconds || 0),
+      0,
+    );
 
     const h = Math.floor(totalSeconds / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
 
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   }
 
   @action
@@ -81,12 +85,12 @@ export default class TimeRegistrationReportController extends Controller {
       });
       this.hasSearched = true;
       // Process data for display
-      this.reportData = result.report.map(row => ({
+      this.reportData = result.report.map((row) => ({
         ...row,
         formattedDuration: this.formatDuration(row.duration_seconds),
         topicUrl: `/t/${row.topic_id}/${row.post_number}`,
         // Use browser's native locale formatting
-        formattedDate: new Date(row.created_at).toLocaleDateString()
+        formattedDate: new Date(row.created_at).toLocaleDateString(),
       }));
     } catch (e) {
       popupAjaxError(e);

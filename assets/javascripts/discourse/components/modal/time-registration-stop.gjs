@@ -1,15 +1,16 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
+import { Input } from "@ember/component";
+import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
 import DButton from "discourse/components/d-button";
 import DModal from "discourse/components/d-modal";
-import { Input } from "@ember/component";
-import i18n from "discourse/helpers/i18n";
-import { on } from "@ember/modifier";
+import { i18n } from "discourse-i18n";
 
 export default class TimeRegistrationStop extends Component {
   @service siteSettings;
+
   @tracked description = this.args.model.currentDescription || "";
   @tracked duration = "";
   @tracked _useRounding = true;
@@ -29,7 +30,7 @@ export default class TimeRegistrationStop extends Component {
   }
 
   calculateDuration() {
-    if (!this.args.model.startTime) return;
+    if (!this.args.model.startTime) {return;}
 
     const now = Math.floor(Date.now() / 1000);
     const start = parseInt(this.args.model.startTime, 10);
@@ -47,7 +48,7 @@ export default class TimeRegistrationStop extends Component {
       const interval = parseInt(this.siteSettings.time_registration_rounding_interval, 10);
       const roundUpAt = parseInt(this.siteSettings.time_registration_round_up_at, 10);
 
-      if (interval <= 0) return seconds;
+      if (interval <= 0) {return seconds;}
 
       const base = Math.floor(minutes / interval) * interval;
       const remainder = minutes % interval;

@@ -19,7 +19,9 @@ export default {
         .map((id) => parseInt(id, 10));
 
       const userGroups = currentUser.groups.map((g) => g.id);
-      const canTrack = currentUser.admin || allowedGroups.some((id) => userGroups.includes(id));
+      const canTrack =
+        currentUser.admin ||
+        allowedGroups.some((id) => userGroups.includes(id));
 
       if (!canTrack) {
         return;

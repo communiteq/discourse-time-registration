@@ -1,6 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import TimeRegistrationSmallActionPost from "../components/time-registration-small-action-post";
 import { i18n } from "discourse-i18n";
+import TimeRegistrationSmallActionPost from "../components/time-registration-small-action-post";
 
 function initPlugin(api) {
   const siteSettings = api.container.lookup("service:site-settings");

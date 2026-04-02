@@ -2,10 +2,10 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import DButton from "discourse/components/d-button";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import I18n from "discourse-i18n";
-import DButton from "discourse/components/d-button";
+import { i18n } from "discourse-i18n";
 import TimeRegistrationStart from "./modal/time-registration-start";
 import TimeRegistrationStop from "./modal/time-registration-stop";
 
@@ -61,13 +61,13 @@ export default class TimeRegistrationIcon extends Component {
       }
 
       if (!topicId) {
-        this.dialog.alert(I18n.t("time_registration.must_be_in_topic"));
+        this.dialog.alert(i18n("time_registration.must_be_in_topic"));
         return;
       }
 
       this.modal.show(TimeRegistrationStart, {
         model: {
-          topicId: topicId,
+          topicId,
           saveTimer: (desc) => this.startTimer(topicId, desc),
           saveManual: (desc, minutes) => this.logManual(topicId, desc, minutes),
         },
@@ -79,8 +79,8 @@ export default class TimeRegistrationIcon extends Component {
 
       this.modal.show(TimeRegistrationStop, {
         model: {
-            currentDescription: currentDescription,
-            startTime: startTime,
+            currentDescription,
+            startTime,
             save: (desc, minutes) => this.stopTimer(desc, minutes)
         }
       });

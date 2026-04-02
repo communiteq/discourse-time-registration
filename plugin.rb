@@ -1,6 +1,6 @@
 # name: discourse-time-registration
 # about: Time Registration for Discourse
-# version: 1.1
+# version: 2026.3
 # authors: Communiteq
 
 enabled_site_setting :time_registration_enabled
